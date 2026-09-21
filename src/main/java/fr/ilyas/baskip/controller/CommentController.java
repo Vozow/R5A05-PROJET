@@ -8,9 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/players")
+@RequestMapping("/api/comments")
 public class CommentController {
 
     private final CommentRepository commentRepository;
@@ -22,6 +23,12 @@ public class CommentController {
     @GetMapping
     public List<Comment> getAllComments() {
         return this.commentRepository.findAll();
+    }
+
+    @GetMapping
+    public ResponseEntity<Comment> getCommentById(@RequestParam int id) {
+        Optional<Comment> comment = this.commentRepository.findById(id);
+        return comment.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping
