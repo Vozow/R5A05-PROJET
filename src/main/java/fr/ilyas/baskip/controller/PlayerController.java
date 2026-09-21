@@ -38,11 +38,11 @@ public class PlayerController {
 
     @PostMapping
     public ResponseEntity<Player> addPlayer(@RequestBody Player player) {
-        if (this.playerRepository.existsById(player.getPlayerId())) {
+        if (this.playerRepository.existsByLicenseNumber(player.getLicenseNumber())) {
             return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
         } else {
             this.playerRepository.save(player);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
     }
 
@@ -50,7 +50,7 @@ public class PlayerController {
     public ResponseEntity<Player> updatePlayer(@RequestBody Player player) {
         if (this.playerRepository.existsById(player.getPlayerId())) {
             this.playerRepository.save(player);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

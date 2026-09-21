@@ -11,4 +11,6 @@ import java.util.List;
 public interface PlayerRepository extends JpaRepository<Player, Integer> {
 
     List<Player> findByStatus(PlayerStatus status);
+
+    boolean existsByLicenseNumber(Integer licenseNumber);
 }
