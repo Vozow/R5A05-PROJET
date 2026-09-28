@@ -25,28 +25,28 @@ public class PlayerController {
         return this.playerRepository.findAll();
     }
 
-    @GetMapping
-    public ResponseEntity<Player> getPlayerById(@RequestParam int id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Player> getPlayerById(@PathVariable int id) {
         Optional<Player> player = this.playerRepository.findById(id);
         return player.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping
-    public List<Player> getPlayerByStatus(@RequestParam String status) {
-        return this.playerRepository.findByStatus(PlayerStatus.valueOf(status));
+    @GetMapping("/status/{status}")
+    public List<Player> getPlayerByStatus(@PathVariable String status) {
+        return this.playerRepository.findByStatus(PlayerStatus.valueOf(status.toUpperCase()));
     }
 
     @PostMapping
     public ResponseEntity<Player> addPlayer(@RequestBody Player player) {
         if (this.playerRepository.existsByLicenseNumber(player.getLicenseNumber())) {
-            return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         } else {
             this.playerRepository.save(player);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
     }
 
-    @PostMapping
+    @PutMapping
     public ResponseEntity<Player> updatePlayer(@RequestBody Player player) {
         if (this.playerRepository.existsById(player.getPlayerId())) {
             this.playerRepository.save(player);
@@ -56,8 +56,8 @@ public class PlayerController {
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deletePlayer(@RequestParam int id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePlayer(@PathVariable int id) {
         if (this.playerRepository.existsById(id)) {
             this.playerRepository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

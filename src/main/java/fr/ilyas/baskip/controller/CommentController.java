@@ -25,19 +25,14 @@ public class CommentController {
         return this.commentRepository.findAll();
     }
 
-    @GetMapping
-    public ResponseEntity<Comment> getCommentById(@RequestParam int id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Comment> getCommentById(@PathVariable  int id) {
         Optional<Comment> comment = this.commentRepository.findById(id);
         return comment.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping
-    public List<Comment> getCommentsByPlayer(Player player) {
-        return this.commentRepository.findByPlayer(player);
-    }
-
-    @GetMapping
-    public List<Comment> getCommentsByIdPlayer(int id) {
+    @GetMapping("/player/{id}")
+    public List<Comment> getCommentsByIdPlayer(@PathVariable int id) {
         return this.commentRepository.findByPlayer_PlayerId(id);
     }
 
@@ -47,7 +42,7 @@ public class CommentController {
         return new ResponseEntity<>(comment, HttpStatus.CREATED);
     }
 
-    @PostMapping
+    @PutMapping
     public ResponseEntity<Comment> updateComment(@RequestBody Comment comment) {
         if(this.commentRepository.existsById(comment.getCommentId())) {
             this.commentRepository.save(comment);
@@ -57,11 +52,11 @@ public class CommentController {
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<Comment> deleteComment(@RequestBody Comment comment) {
-        if(this.commentRepository.existsById(comment.getCommentId())) {
-            this.commentRepository.delete(comment);
-            return new ResponseEntity<>(comment, HttpStatus.NO_CONTENT);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteComment(@PathVariable int id) {
+        if(this.commentRepository.existsById(id)) {
+            this.commentRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

@@ -10,7 +10,5 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
-    List<Comment> findByPlayer(Player player);
-
     List<Comment> findByPlayer_PlayerId(Integer playerId);
 }

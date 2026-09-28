@@ -14,7 +14,6 @@ public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer playerId;
-
     private String lastName;
     private String firstName;
     private Integer licenseNumber;

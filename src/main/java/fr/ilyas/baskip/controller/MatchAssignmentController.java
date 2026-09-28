@@ -1,6 +1,5 @@
 package fr.ilyas.baskip.controller;
 
-import fr.ilyas.baskip.model.Match;
 import fr.ilyas.baskip.model.MatchAssignment;
 import fr.ilyas.baskip.repository.MatchAssignmentRepository;
 
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/matchassignment")
+@RequestMapping("/api/match-assignments")
 public class MatchAssignmentController {
 
     private final MatchAssignmentRepository matchAssignmentRepository;
@@ -26,47 +25,47 @@ public class MatchAssignmentController {
         return matchAssignmentRepository.findAll();
     }
 
-    @GetMapping
-    public ResponseEntity<MatchAssignment> getMatchAssignmentById(@RequestParam int id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<MatchAssignment> getMatchAssignmentById(@PathVariable int id) {
         Optional<MatchAssignment> matchAssignment = this.matchAssignmentRepository.findById(id);
         return matchAssignment.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping
-    public List<MatchAssignment> getMatchAssignmentByMatchId(Integer matchId) {
-        return matchAssignmentRepository.findByMatch_MatchId(matchId);
+    @GetMapping("/match/{id}")
+    public List<MatchAssignment> getMatchAssignmentByMatchId(@PathVariable int id) {
+        return matchAssignmentRepository.findByMatch_MatchId(id);
     }
 
-    @GetMapping
-    public List<MatchAssignment> getMatchAssignmentByPlayerId(Integer playerId) {
-        return matchAssignmentRepository.findByPlayer_PlayerId(playerId);
+    @GetMapping("/player/{id}")
+    public List<MatchAssignment> getMatchAssignmentByPlayerId(@PathVariable int id) {
+        return matchAssignmentRepository.findByPlayer_PlayerId(id);
     }
 
-    @GetMapping
-    public ResponseEntity<MatchAssignment> getMatchAssignmentByPlayerIdAndMatchId(Integer playerId, Integer matchId) {
+    @GetMapping("/match-player/{playerId}/{matchId}")
+    public ResponseEntity<MatchAssignment> getMatchAssignmentByPlayerIdAndMatchId(@PathVariable int playerId, @PathVariable int matchId) {
         Optional<MatchAssignment> matchAssignment = this.matchAssignmentRepository.findByPlayer_PlayerIdAndMatch_MatchId(playerId, matchId);
         return matchAssignment.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
 
     @PostMapping
-    public ResponseEntity<MatchAssignment> createMatch(@RequestBody MatchAssignment matchAssignment) {
+    public ResponseEntity<MatchAssignment> createMatchAssignment(@RequestBody MatchAssignment matchAssignment) {
         this.matchAssignmentRepository.save(matchAssignment);
         return new ResponseEntity<>(matchAssignment, HttpStatus.CREATED);
     }
 
-    @PostMapping
-    public ResponseEntity<MatchAssignment> updateMatch(@RequestBody MatchAssignment matchAssignment) {
+    @PutMapping
+    public ResponseEntity<MatchAssignment> updateMatchAssignment(@RequestBody MatchAssignment matchAssignment) {
         if (this.matchAssignmentRepository.existsById(matchAssignment.getAssignmentId())) {
             this.matchAssignmentRepository.save(matchAssignment);
             return new ResponseEntity<>(matchAssignment, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(matchAssignment, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<MatchAssignment> deleteMatch(@RequestParam int id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMatchAssignment(@PathVariable int id) {
         if (this.matchAssignmentRepository.existsById(id)) {
             this.matchAssignmentRepository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
