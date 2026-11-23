@@ -106,9 +106,10 @@ public class MatchAssignmentService {
         }
         Match match = existing.getMatch();
 
-        boolean slotChanged = assignment.getPosition() != existing.getPosition()
-                || !assignment.getIsSubstitute().equals(existing.getIsSubstitute());
-        if (slotChanged) {
+        if (!assignment.getIsSubstitute().equals(existing.getIsSubstitute())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Erreur - Un titulaire ne peut pas devenir remplaçant, ni l'inverse");
+        }
+        if (assignment.getPosition() != existing.getPosition()) {
             if (match.getStatus() != MatchStatus.PREPARATION) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Erreur - Le match doit être en préparation");
             }

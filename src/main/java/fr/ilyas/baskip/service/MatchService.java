@@ -68,6 +68,15 @@ public class MatchService {
         if (match.getStatus() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - L'état du match est obligatoire");
         }
+        if (!match.getMatchDate().isAfter(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - Un match ne peut pas être programmé dans le passé");
+        }
+        if (match.getStatus() == MatchStatus.IN_PROGRESS || match.getStatus() == MatchStatus.FINISHED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - Un match à venir ne peut pas être en cours ou terminé");
+        }
+        if (match.getTeamScore() != null || match.getOpponentScore() != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - Le score ne peut être saisi que pour un match en cours ou terminé");
+        }
         return this.matchRepository.save(match);
     }
 
@@ -93,12 +102,28 @@ public class MatchService {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        boolean dateChanged = !match.getMatchDate().equals(existing.getMatchDate());
-        if (dateChanged && existing.getMatchDate() != null && existing.getMatchDate().isBefore(now)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Erreur - La date d'un match passé ne peut pas être modifiée");
+        boolean matchPasse = existing.getMatchDate() != null && !existing.getMatchDate().isAfter(now);
+        if (matchPasse && (!match.getMatchDate().equals(existing.getMatchDate())
+                || !match.getOpposingTeam().equals(existing.getOpposingTeam())
+                || !match.getIsHome().equals(existing.getIsHome())
+                || !match.getAddress().equals(existing.getAddress()))) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Erreur - Seuls l'état et le score d'un match passé peuvent être modifiés");
         }
-        if (dateChanged && !match.getMatchDate().isAfter(now)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - La nouvelle date du match doit être dans le futur");
+        if (!matchPasse && !match.getMatchDate().isAfter(now)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - La date du match doit être dans le futur");
+        }
+        if ((match.getStatus() == MatchStatus.IN_PROGRESS || match.getStatus() == MatchStatus.FINISHED) && match.getMatchDate().isAfter(now)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - Un match à venir ne peut pas être en cours ou terminé");
+        }
+        if ((match.getStatus() == MatchStatus.WAITING || match.getStatus() == MatchStatus.PREPARATION)
+                && (match.getTeamScore() != null || match.getOpponentScore() != null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - Le score ne peut être saisi que pour un match en cours ou terminé");
+        }
+        if (match.getStatus() == MatchStatus.FINISHED && (match.getTeamScore() == null || match.getOpponentScore() == null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - Les deux scores sont obligatoires pour un match terminé");
+        }
+        if ((match.getTeamScore() != null && match.getTeamScore() < 0) || (match.getOpponentScore() != null && match.getOpponentScore() < 0)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - Un score ne peut pas être négatif");
         }
 
         existing.setMatchDate(match.getMatchDate());

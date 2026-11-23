@@ -1,6 +1,7 @@
 package fr.ilyas.baskip.repository;
 
 import fr.ilyas.baskip.model.MatchAssignment;
+import fr.ilyas.baskip.model.MatchStatus;
 import fr.ilyas.baskip.model.PlayerPosition;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,6 +19,8 @@ public interface MatchAssignmentRepository extends JpaRepository<MatchAssignment
     Optional<MatchAssignment> findByPlayer_PlayerIdAndMatch_MatchId(Integer playerId, Integer matchId);
 
     boolean existsByPlayer_PlayerId(Integer playerId);
+
+    boolean existsByPlayer_PlayerIdAndMatch_Status(Integer playerId, MatchStatus status);
 
     boolean existsByPlayer_PlayerIdAndMatch_MatchId(Integer playerId, Integer matchId);
 

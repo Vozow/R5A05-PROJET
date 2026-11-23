@@ -1,5 +1,6 @@
 package fr.ilyas.baskip.service;
 
+import fr.ilyas.baskip.model.MatchStatus;
 import fr.ilyas.baskip.model.Player;
 import fr.ilyas.baskip.model.PlayerStatus;
 import fr.ilyas.baskip.repository.MatchAssignmentRepository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -63,6 +65,18 @@ public class PlayerService {
         if (player.getHeight() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - La taille est obligatoire");
         }
+        if (player.getLicenseNumber() < 1 || player.getLicenseNumber() > 99999999) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - Le numéro de licence doit être compris entre 1 et 99999999");
+        }
+        if (player.getWeight() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - Le poids doit être positif");
+        }
+        if (player.getHeight() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - La taille doit être positive");
+        }
+        if (!player.getBirthDate().isBefore(LocalDate.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - La date de naissance doit être dans le passé");
+        }
         if (player.getStatus() == null) {
             player.setStatus(PlayerStatus.ACTIVE);
         }
@@ -95,8 +109,24 @@ public class PlayerService {
         if (player.getHeight() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - La taille est obligatoire");
         }
+        if (player.getLicenseNumber() < 1 || player.getLicenseNumber() > 99999999) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - Le numéro de licence doit être compris entre 1 et 99999999");
+        }
+        if (player.getWeight() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - Le poids doit être positif");
+        }
+        if (player.getHeight() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - La taille doit être positive");
+        }
+        if (!player.getBirthDate().isBefore(LocalDate.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur - La date de naissance doit être dans le passé");
+        }
         if (player.getStatus() == null) {
             player.setStatus(PlayerStatus.ACTIVE);
+        }
+        if (player.getStatus() != existing.getStatus() && player.getStatus() != PlayerStatus.ACTIVE
+                && this.matchAssignmentRepository.existsByPlayer_PlayerIdAndMatch_Status(existing.getPlayerId(), MatchStatus.PREPARATION)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Erreur - Le joueur est sélectionné pour un match en préparation, retirez-le avant de changer son état");
         }
         if (this.playerRepository.existsByLicenseNumberAndPlayerIdNot(player.getLicenseNumber(), player.getPlayerId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Erreur - Le numéro de licence " + player.getLicenseNumber() + " est déjà utilisé");
