@@ -1,69 +1,61 @@
 package fr.ilyas.baskip.controller;
 
+import fr.ilyas.baskip.dto.PlayerStatistics;
 import fr.ilyas.baskip.model.Player;
-import fr.ilyas.baskip.model.PlayerStatus;
-import fr.ilyas.baskip.repository.PlayerRepository;
+import fr.ilyas.baskip.service.PlayerService;
+import fr.ilyas.baskip.service.PlayerStatisticsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/players")
 public class PlayerController {
 
-    private final PlayerRepository playerRepository;
+    private final PlayerService playerService;
+    private final PlayerStatisticsService playerStatisticsService;
 
-    public PlayerController(PlayerRepository playerRepository) {
-        this.playerRepository = playerRepository;
+    public PlayerController(PlayerService playerService, PlayerStatisticsService playerStatisticsService) {
+        this.playerService = playerService;
+        this.playerStatisticsService = playerStatisticsService;
     }
 
     @GetMapping
     public List<Player> getAllPlayers() {
-        return this.playerRepository.findAll();
+        return this.playerService.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Player> getPlayerById(@PathVariable int id) {
-        Optional<Player> player = this.playerRepository.findById(id);
-        return player.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return new ResponseEntity<>(this.playerService.findById(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/statistics")
+    public ResponseEntity<PlayerStatistics> getPlayerStatistics(@PathVariable int id) {
+        return new ResponseEntity<>(this.playerStatisticsService.getStatistics(id), HttpStatus.OK);
     }
 
     @GetMapping("/status/{status}")
     public List<Player> getPlayerByStatus(@PathVariable String status) {
-        return this.playerRepository.findByStatus(PlayerStatus.valueOf(status.toUpperCase()));
+        return this.playerService.findByStatus(status);
     }
 
     @PostMapping
     public ResponseEntity<Player> addPlayer(@RequestBody Player player) {
-        if (this.playerRepository.existsByLicenseNumber(player.getLicenseNumber())) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        } else {
-            this.playerRepository.save(player);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        }
+        return new ResponseEntity<>(this.playerService.create(player), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<Player> updatePlayer(@RequestBody Player player) {
-        if (this.playerRepository.existsById(player.getPlayerId())) {
-            this.playerRepository.save(player);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(this.playerService.update(player), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePlayer(@PathVariable int id) {
-        if (this.playerRepository.existsById(id)) {
-            this.playerRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        this.playerService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

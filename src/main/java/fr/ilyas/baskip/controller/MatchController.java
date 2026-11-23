@@ -1,8 +1,7 @@
 package fr.ilyas.baskip.controller;
 
 import fr.ilyas.baskip.model.Match;
-import fr.ilyas.baskip.model.MatchStatus;
-import fr.ilyas.baskip.repository.MatchRepository;
+import fr.ilyas.baskip.service.MatchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,67 +9,55 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/matches")
 public class MatchController {
 
-    private final MatchRepository matchRepository;
+    private final MatchService matchService;
 
-    public MatchController(MatchRepository matchRepository) {
-        this.matchRepository = matchRepository;
+    public MatchController(MatchService matchService) {
+        this.matchService = matchService;
     }
 
     @GetMapping
     public List<Match> getAllMatches() {
-        return matchRepository.findAll();
+        return this.matchService.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Match> getMatchById(@PathVariable int id) {
-        Optional<Match> match = this.matchRepository.findById(id);
-        return match.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return new ResponseEntity<>(this.matchService.findById(id), HttpStatus.OK);
     }
 
     @GetMapping("/status/{status}")
     public List<Match> getMatchByStatus(@PathVariable String status) {
-        return this.matchRepository.findByStatus(MatchStatus.valueOf(status.toUpperCase()));
+        return this.matchService.findByStatus(status);
     }
 
     @GetMapping("/before/{timestamp}")
     public List<Match> getMatchByMatchDateBefore(@PathVariable long timestamp) {
-        return this.matchRepository.findByMatchDateBefore(LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.UTC));
+        return this.matchService.findBefore(LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.UTC));
     }
 
     @GetMapping("/after/{timestamp}")
     public List<Match> getMatchByMatchDateAfter(@PathVariable long timestamp) {
-        return this.matchRepository.findByMatchDateAfter(LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.UTC));
+        return this.matchService.findAfter(LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.UTC));
     }
 
     @PostMapping
     public ResponseEntity<Match> createMatch(@RequestBody Match match) {
-        this.matchRepository.save(match);
-        return new ResponseEntity<>(match, HttpStatus.CREATED);
+        return new ResponseEntity<>(this.matchService.create(match), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<Match> updateMatch(@RequestBody Match match) {
-        if (this.matchRepository.existsById(match.getMatchId())) {
-            this.matchRepository.save(match);
-            return new ResponseEntity<>(match, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(this.matchService.update(match), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMatch(@PathVariable int id) {
-        if (this.matchRepository.existsById(id)) {
-            this.matchRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        this.matchService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

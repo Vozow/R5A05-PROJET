@@ -13,4 +13,6 @@ public interface PlayerRepository extends JpaRepository<Player, Integer> {
     List<Player> findByStatus(PlayerStatus status);
 
     boolean existsByLicenseNumber(Integer licenseNumber);
+
+    boolean existsByLicenseNumberAndPlayerIdNot(Integer licenseNumber, Integer playerId);
 }
