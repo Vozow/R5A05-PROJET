@@ -1,4 +1,6 @@
-package fr.ilyas.baskip.model;
+package fr.ilyas.baskip.dto;
+
+import fr.ilyas.baskip.model.PlayerPosition;
 
 public class PlayerStatistics {
 

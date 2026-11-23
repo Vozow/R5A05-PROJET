@@ -1,13 +1,11 @@
 package fr.ilyas.baskip.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "game_match")
@@ -28,6 +26,10 @@ public class Match {
 
     @Enumerated(EnumType.STRING)
     private MatchStatus status;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "match", cascade = CascadeType.REMOVE)
+    private List<MatchAssignment> assignments = new ArrayList<>();
 
     public Match() {
     }
@@ -106,4 +108,9 @@ public class Match {
     public void setStatus(MatchStatus status) {
         this.status = status;
     }
+
+    public List<MatchAssignment> getAssignments() {
+        return assignments;
+    }
+
 }

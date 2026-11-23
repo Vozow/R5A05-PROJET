@@ -1,7 +1,6 @@
 package fr.ilyas.baskip.controller;
 
 import fr.ilyas.baskip.model.Comment;
-import fr.ilyas.baskip.model.Player;
 import fr.ilyas.baskip.repository.CommentRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,5 +1,6 @@
 package fr.ilyas.baskip.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,10 +17,11 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer commentId;
 
+    @Column(nullable = false, length = 2000)
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "player_id")
+    @JoinColumn(name = "player_id", nullable = false)
     private Player player;
 
     public Comment() {

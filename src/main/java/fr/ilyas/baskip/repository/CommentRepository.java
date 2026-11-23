@@ -1,7 +1,6 @@
 package fr.ilyas.baskip.repository;
 
 import fr.ilyas.baskip.model.Comment;
-import fr.ilyas.baskip.model.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

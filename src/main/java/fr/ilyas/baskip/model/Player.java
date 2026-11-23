@@ -1,14 +1,15 @@
 package fr.ilyas.baskip.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Table(name = "player")
 public class Player {
 
     @Id
@@ -16,18 +17,28 @@ public class Player {
     private Integer playerId;
     private String lastName;
     private String firstName;
+    @Column(unique = true, nullable = false)
     private Integer licenseNumber;
     private Double weight;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
     private Double height;
 
     @Enumerated(EnumType.STRING)
     private PlayerStatus status;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "player", cascade = CascadeType.REMOVE)
+    private List<MatchAssignment> assignments = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "player", cascade = CascadeType.REMOVE)
+    private List<Comment> comments = new ArrayList<>();
+
     public Player() {
     }
 
-        public Player(Integer playerId, String lastName, String firstName, Integer licenseNumber, Double weight, LocalDate birthDate, Double height, PlayerStatus status) {
+    public Player(Integer playerId, String lastName, String firstName, Integer licenseNumber, Double weight, LocalDate birthDate, Double height, PlayerStatus status) {
         this.playerId = playerId;
         this.lastName = lastName;
         this.firstName = firstName;
@@ -101,4 +112,13 @@ public class Player {
     public void setStatus(PlayerStatus status) {
         this.status = status;
     }
+
+    public List<MatchAssignment> getAssignments() {
+        return assignments;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
 }

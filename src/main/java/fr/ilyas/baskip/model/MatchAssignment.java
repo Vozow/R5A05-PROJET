@@ -35,14 +35,14 @@ public class MatchAssignment {
     @Enumerated(EnumType.STRING)
     private PlayerPosition position;
 
-    private boolean isSubstitute;
+    private Boolean isSubstitute;
 
     private Double rating;
 
     public MatchAssignment() {
     }
 
-    public MatchAssignment(Integer assignmentId, Player player, Match match, PlayerPosition position, boolean isSubstitute, Double rating) {
+    public MatchAssignment(Integer assignmentId, Player player, Match match, PlayerPosition position, Boolean isSubstitute, Double rating) {
         this.assignmentId = assignmentId;
         this.player = player;
         this.match = match;
@@ -83,11 +83,11 @@ public class MatchAssignment {
         this.position = position;
     }
 
-    public boolean isSubstitute() {
+    public Boolean getIsSubstitute() {
         return isSubstitute;
     }
 
-    public void setSubstitute(boolean isSubstitute) {
+    public void setIsSubstitute(Boolean isSubstitute) {
         this.isSubstitute = isSubstitute;
     }
 
